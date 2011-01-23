@@ -1,0 +1,134 @@
+// ------------------------------------------------------------------------------------------
+
+# Cum se creeaza un repository local GIT
+
+git init // Initilizeaza un repository GIT in folderul proiectului.
+	
+	OBS:
+	In folderul proiectului in care este initializat repository-ul GIT se va creea un folder '.git' care va reprezenta scheletul repository-ului.
+
+git clone REPOSITORY_URL_SOURCE [REPOSITORY_URL_DESTINATION] // Face o copie a repository-ului REPOSITORY_URL_SOURCE cat si a fisierelor versionate.
+	
+	OBS:
+	Copia va fi intr-un folder care va avea numele URN-ul corespunzator REPOSITORY_URL_SOURCE daca REPOSITORY_URL_DESTINATION nu e specificat sau URN-ul
+	corespunzator REPOSITORY_URL_DESTINATION daca este specificat.
+	
+git clone --bare REPOSITORY_URL_SOURCE [REPOSITORY_URL_DESTINATION] // Face o copie a repository-ului REPOSITORY_URL_SOURCE fara fisierele versionate.
+
+	OBS:
+	Pentru comunicarea cu un repository remote GIT poate folosi unul din protocoalele urmatoare:
+	1. GIT -> git://SERVER_NAME/URI/URN.git
+	2. HTTPS(S) -> http(s)://SERVER_NAME/URI/URN.git
+	3. SSH -> user@SERVER_NAME/URI/URN.git
+
+// ------------------------------------------------------------------------------------------
+
+# Cum se afiseaza statutul fisierelor dintr-un proiect gestionat de GIT
+
+git status // Arata statusul fisierelor din proiect cat si din zona de asteptare
+
+	PARAMETRII:
+	-s // Arata sub forma scurta
+			
+	OBS:
+	Fisierele sunt gestionate de GIT prin indexare adica perechi sub forma:
+	FISIER_NUME CHECKSUM_FISIER(SHA1)
+
+	OBS:
+	Fisierele pot fi:
+	- untracked | noi, neindexate
+	- tracked | indexate	-> unmodified | reprezinta ultima versiune
+							-> modified | ar putea fi ultima versiune	-> unstaged | nu sunt pe cale de a reprezenta ultima versiune	-> uncommited | nu reprezinta ultima versiune
+																		-> staged | sunt pe cale de a reprezenta ultima versiune 		-> commited | reprezinta ultima versiune
+	OBS:
+	Un folder/fiser poate fi ignorat de catre 'git status' daca este trecut in fisierul '.gitignore' din folderul proiectului. (Wild card-urile pot fi folosite)
+
+// ------------------------------------------------------------------------------------------
+
+# Afisarea diferentelor dintre niste fisierele noi si fisierele ultimei versiuni (patch-uri altfel spus)
+
+git diff // Arata diferenta dintre fisierele unstaged si fisierele din ultima versiune
+
+	PARAMETRII:
+	--cached	// --//-- staged --//--
+	HEAD		// --//-- staged si unstaged --//--
+	--stat		// Arata un sumar al schimbarilor in loc de diferenta detaliata	
+
+	OBS:
+	HEAD este o referinta catre versiunea actuala (commit-ul actual) pe care se lucreaza.
+
+// -------------------------------------------------------------------------------------------
+
+# Cum sa gestionezi fisierele
+
+git add FOLDER/FILE // Daca fisierul este untracked, devine tracked dupa care staged sau daca fisierul este modified devine staged.
+
+	OBS:
+	Daca este specificat un folder se verifica recursiv daca continutul este untracked caz in care devine tracked dupa care staged sau
+	daca conntinutul este modified devine staged.
+
+git commit // Face un nou snapshot (o noua versiune a proiectului) tinand cont de ce este staged. Va deschide un fisier (care arata si ce este nou) in care se va trece mesajul commitului.
+	
+	PARAMETRII:
+	-m "MESAJ" 		// Commit cu mesaj specificat pe o linie.
+	-a 				// Commit pentru care adaugarea in zona de asteptare a (stagging) fisierelor care sunt tracked se face automat (fisierele untracked nu sunt considerate).
+
+	OBS:
+	Noul snapshot va fi adresat prin checksum-ul commit-ului. Checksum-ul ultimului commit este adresat prin tag-ul HEAD.
+
+	OBS:
+	De fiecare data cand are loc un commit, in mod transparent este inregistrat si patch-ul (diferenta) prin care se face update. 
+
+git rm FILE/FOLDER // Fisierul/folderul devine untracked si este sters de pe hard disk
+
+	PARAMETRII:
+	--cached (file/folder) // Fisierul/folderul devine untracked dar nu este sters de pe hard disk
+
+git mv FILE/FOLDER // Muta/redenumeste FILE/FOLDER (ce face de fapt: git rm --cached, mv FILE/FOLDER, git add)
+
+	OBS: 
+	GIT nu urmareste rename/move-urile, de aceea, foloseste 'git mv' pentru ca indexul sa fie actualizat automat.
+
+// -------------------------------------------------------------------------------------------
+
+# Cum sa vezi istoricul pentru commit-uri
+
+git log // Afiseaza istoricul pentru commit-uri in ordine cronologica pana la commitul referntiat de HEAD
+
+	PARAMETERI:
+	-p	Afiseaza patch-ul pentru fiecare commit.
+	--stat	Afiseaza statistici pentru fiecare fisier modificat in commit.
+	--shortstat Este --stat in format scurt.
+
+	--name-only	Afiseaza fisierele modificate in urma commit-ului.
+	--name-status Afiseaza fisierele si modificarile efectuate asupra lor in urma commit-ului.
+	
+	--abbrev-commit	Abreviaza checksum-urile commit-urilor.
+	--relative-date	Afiseaza data in format relativ (ex. 2 weeks ago).
+	
+	--graph	Afiseaza un graf ASCII care arata relatiile dintre commit-uri.
+	--decorate Afiseaza referintele si tagurile.
+	
+	--oneline Afiseaza pe o singura linie checksum-ul commit-ului abreviat si mesajul.
+
+	-(n) // Daca '-n' este specificat, arata ultimele 'n' commit-uri care au avut loc.
+	--since="", --after="" (ex. since="2.weeks" sau since="18-10-2010")
+	--until="", --before=""
+	--author="" // Filtreaza dupa autor
+	--committer="" // Filtlreaza dupa commiter
+
+// -------------------------------------------------------------------------------------------
+
+# Cum poti actualiza sarcini efectuate
+
+git commit --amend // Pentru a actualiza commit-ul referentiat de HEAD (Poti sa mai adaugi fisiere, poti schimba titlul etc. inainte de acest commit)
+git reset HEAD FILE/FOLDER // Pentru a scoate fisierul din zona de asteptatre (staging)
+git checkout FILE // Pentru a reseta un fisier la cum arata in versiunea actuala (HEAD)
+
+// -------------------------------------------------------------------------------------------
+
+# Cum sa schimbi copia/versiunea pe care lucrezi
+
+git reset REVISION/COMMIT_CHECKSUM // Face ca HEAD sa referentieze COMMIT_CHECKSUM
+
+// -------------------------------------------------------------------------------------------
